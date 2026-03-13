@@ -13,6 +13,7 @@ class DependencyContainer: ObservableObject {
     let getForecastUseCase: GetForecastUseCase
     let searchLocationUseCase: SearchLocationUseCase
     let toggleFavoriteUseCase: ToggleFavoriteUseCase
+    let isFavoriteUseCase: IsFavoriteUseCase
     
     init() {
         let apiClient = APIClient.shared
@@ -24,6 +25,7 @@ class DependencyContainer: ObservableObject {
         self.getForecastUseCase = GetForecastUseCase(repository: weatherRepository)
         self.searchLocationUseCase = SearchLocationUseCase(repository: weatherRepository)
         self.toggleFavoriteUseCase = ToggleFavoriteUseCase(repository: favoritesRepository)
+        self.isFavoriteUseCase = IsFavoriteUseCase(repository: favoritesRepository)
     }
     
     @MainActor
@@ -33,6 +35,7 @@ class DependencyContainer: ObservableObject {
             getForecastUseCase: getForecastUseCase,
             searchLocationUseCase: searchLocationUseCase,
             toggleFavoriteUseCase: toggleFavoriteUseCase,
+            isFavoriteUseCase: isFavoriteUseCase,
             locationManager: LocationManager.shared
         )
     }
@@ -53,6 +56,7 @@ class DependencyContainer: ObservableObject {
             getForecastUseCase: getForecastUseCase,
             searchLocationUseCase: searchLocationUseCase,
             toggleFavoriteUseCase: toggleFavoriteUseCase,
+            isFavoriteUseCase: isFavoriteUseCase,
             locationManager: LocationManager.shared
         )
     }

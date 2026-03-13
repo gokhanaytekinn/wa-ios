@@ -42,7 +42,8 @@ struct ForecastScreen: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { viewModel.toggleFavorite() }) {
-                        Image(systemName: "heart")
+                        Image(systemName: viewModel.isFavorite ? "heart.fill" : "heart")
+                            .foregroundColor(viewModel.isFavorite ? .red : .primary)
                     }
                 }
             }

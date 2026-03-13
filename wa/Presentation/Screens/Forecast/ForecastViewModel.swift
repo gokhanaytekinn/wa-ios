@@ -9,10 +9,12 @@ class ForecastViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var isSearching: Bool = false
     @Published var expandedSources: Set<String> = []
+    @Published var isFavorite: Bool = false
     
     private let getForecastUseCase: GetForecastUseCase
     private let searchLocationUseCase: SearchLocationUseCase
     private let toggleFavoriteUseCase: ToggleFavoriteUseCase
+    private let isFavoriteUseCase: IsFavoriteUseCase
     private let locationManager: LocationManager
     
     private var searchCancellable: AnyCancellable?
@@ -22,11 +24,13 @@ class ForecastViewModel: ObservableObject {
         getForecastUseCase: GetForecastUseCase,
         searchLocationUseCase: SearchLocationUseCase,
         toggleFavoriteUseCase: ToggleFavoriteUseCase,
+        isFavoriteUseCase: IsFavoriteUseCase,
         locationManager: LocationManager
     ) {
         self.getForecastUseCase = getForecastUseCase
         self.searchLocationUseCase = searchLocationUseCase
         self.toggleFavoriteUseCase = toggleFavoriteUseCase
+        self.isFavoriteUseCase = isFavoriteUseCase
         self.locationManager = locationManager
         
         setupSearchDebounce()
@@ -41,9 +45,18 @@ class ForecastViewModel: ObservableObject {
                 if let city = location.city {
                     Task {
                         await self?.loadForecast(city: city, district: location.district)
+                        await self?.checkFavoriteState()
                     }
                 }
             }
+    }
+    
+    func checkFavoriteState() async {
+        guard let city = forecastData?.city else { 
+            isFavorite = false
+            return 
+        }
+        isFavorite = await isFavoriteUseCase.execute(location: city)
     }
     
     private func setupSearchDebounce() {
@@ -87,6 +100,7 @@ class ForecastViewModel: ObservableObject {
         guard let city = forecastData?.city else { return }
         Task {
             try? await toggleFavoriteUseCase.execute(location: city)
+            await checkFavoriteState()
         }
     }
     

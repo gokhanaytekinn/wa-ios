@@ -14,11 +14,11 @@ struct LocationSearchResult: Codable, Identifiable {
     
     func getDisplayName() -> String {
         var parts: [String] = []
-        if let district = district, !district.isEmpty {
-            parts.append(district)
-        }
         if let city = city, !city.isEmpty {
             parts.append(city)
+        }
+        if let district = district, !district.isEmpty {
+            parts.append(district)
         }
         
         if parts.isEmpty {

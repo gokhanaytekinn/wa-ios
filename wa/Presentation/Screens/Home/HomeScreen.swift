@@ -45,7 +45,8 @@ struct HomeScreen: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { viewModel.toggleFavorite() }) {
-                        Image(systemName: "heart") // Add logic for filled/empty later if needed
+                        Image(systemName: viewModel.isFavorite ? "heart.fill" : "heart")
+                            .foregroundColor(viewModel.isFavorite ? .red : .primary)
                     }
                 }
             }
