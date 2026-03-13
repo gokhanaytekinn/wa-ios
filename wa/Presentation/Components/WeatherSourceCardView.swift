@@ -10,9 +10,9 @@ struct WeatherSourceCardView: View {
             Button(action: onToggle) {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text(source.sourceName)
+                        Text(source.sourceName ?? "Bilinmeyen Kaynak")
                             .font(.headline)
-                        Text(source.current.condition)
+                        Text(source.current?.condition ?? "Veri Yok")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -20,9 +20,15 @@ struct WeatherSourceCardView: View {
                     Spacer()
                     
                     HStack(spacing: 8) {
-                        Text("\(Int(source.current.temperature.rounded()))°")
-                            .font(.title2)
-                            .fontWeight(.bold)
+                        if let temp = source.current?.temperature {
+                            Text("\(Int(temp.rounded()))°")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                        } else {
+                            Text("--°")
+                                .font(.title2)
+                                .foregroundColor(.secondary)
+                        }
                         
                         Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                             .foregroundColor(.secondary)
@@ -36,18 +42,25 @@ struct WeatherSourceCardView: View {
                 Divider()
                     .padding(.horizontal)
                 
-                VStack(spacing: 12) {
-                    HStack(spacing: 16) {
-                        MetricRow(title: "Hissedilen", value: "\(Int(source.current.feelsLike.rounded()))°", icon: "thermometer")
-                        MetricRow(title: "Nem", value: "%\(source.current.humidity)", icon: "humidity")
+                if let current = source.current {
+                    VStack(spacing: 12) {
+                        HStack(spacing: 16) {
+                            MetricRow(title: "Hissedilen", value: "\(Int(current.feelsLike.rounded()))°", icon: "thermometer")
+                            MetricRow(title: "Nem", value: current.humidity.map { "%\($0)" } ?? "--", icon: "humidity")
+                        }
+                        
+                        HStack(spacing: 16) {
+                            MetricRow(title: "Rüzgar", value: "\(current.windSpeed) km/s", icon: "wind")
+                            MetricRow(title: "Basınç", value: "\(current.pressure) hPa", icon: "barometer")
+                        }
                     }
-                    
-                    HStack(spacing: 16) {
-                        MetricRow(title: "Rüzgar", value: "\(source.current.windSpeed) km/s", icon: "wind")
-                        MetricRow(title: "Basınç", value: "\(source.current.pressure) hPa", icon: "barometer")
-                    }
+                    .padding()
+                } else {
+                    Text("Bu kaynak için anlık veri mevcut değil.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding()
                 }
-                .padding()
             }
         }
         .weatherCardStyle()

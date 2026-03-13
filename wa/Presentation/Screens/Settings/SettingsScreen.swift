@@ -2,7 +2,6 @@ import SwiftUI
 
 struct SettingsScreen: View {
     @StateObject var viewModel: SettingsViewModel
-    @State private var showLogin = false
     
     var body: some View {
         NavigationView {
@@ -21,29 +20,10 @@ struct SettingsScreen: View {
                     }
                 }
                 
-                Section(header: Text("Hesap")) {
-                    if viewModel.isLoggedIn {
-                        HStack {
-                            Image(systemName: "person.circle.fill")
-                                .font(.title)
-                                .foregroundColor(.blue)
-                            VStack(alignment: .leading) {
-                                Text(viewModel.username ?? "Kullanıcı")
-                                    .fontWeight(.bold)
-                                Text("Giriş yapıldı")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        .padding(.vertical, 4)
-                        
-                        Button(role: .destructive, action: viewModel.logout) {
-                            Text("Çıkış Yap")
-                        }
-                    } else {
-                        Button(action: { showLogin = true }) {
-                            Text("Giriş Yap / Kayıt Ol")
-                                .fontWeight(.medium)
+                Section(header: Text("Dil")) {
+                    Picker("Uygulama Dili", selection: $viewModel.language) {
+                        ForEach(AppLanguage.allCases) { lang in
+                            Text(lang.displayName).tag(lang)
                         }
                     }
                 }
@@ -60,9 +40,6 @@ struct SettingsScreen: View {
                 }
             }
             .navigationTitle("Ayarlar")
-            .sheet(isPresented: $showLogin) {
-                LoginScreen(viewModel: viewModel.authRepository as? LoginViewModel ?? LoginViewModel(loginUseCase: DependencyContainer().loginUseCase, registerUseCase: DependencyContainer().registerUseCase))
-            }
         }
     }
 }

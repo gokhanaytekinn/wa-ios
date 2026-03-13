@@ -105,27 +105,33 @@ struct HomeScreen: View {
     private func weatherContent(_ weather: WeatherData) -> some View {
         VStack(spacing: AppTheme.spacing) {
             // Main Weather Info
-            if let mainSource = weather.sources?.first {
-                VStack(spacing: 4) {
-                    Text(weather.location?.city ?? "")
-                        .font(.title)
-                        .fontWeight(.bold)
-                    Text("\(Int(mainSource.current.temperature.rounded()))°")
+            VStack(spacing: 4) {
+                Text(weather.city ?? "")
+                    .font(.title)
+                    .fontWeight(.bold)
+                
+                if let temp = weather.temperature {
+                    Text("\(Int(temp.rounded()))°")
                         .font(.system(size: 64))
                         .fontWeight(.thin)
-                    Text(mainSource.current.condition)
-                        .font(.title3)
-                        .foregroundColor(.secondary)
+                } else {
+                    Text("--°")
+                        .font(.system(size: 64))
+                        .fontWeight(.thin)
                 }
-                .padding(.vertical, 20)
                 
-                // Metrics Grid
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: AppTheme.spacing) {
-                    WeatherMetricCard(title: "Nem", value: "%\(mainSource.current.humidity)", icon: "humidity", unit: "")
-                    WeatherMetricCard(title: "Rüzgar", value: "\(mainSource.current.windSpeed)", icon: "wind", unit: "km/s")
-                    WeatherMetricCard(title: "UV İndeksi", value: "\(mainSource.current.uvIndex)", icon: "sun.max", unit: "")
-                    WeatherMetricCard(title: "Hissedilen", value: "\(Int(mainSource.current.feelsLike))°", icon: "thermometer", unit: "")
-                }
+                Text(weather.description ?? "Bilinmiyor")
+                    .font(.title3)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.vertical, 20)
+            
+            // Metrics Grid
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: AppTheme.spacing) {
+                WeatherMetricCard(title: "Nem", value: weather.humidity.map { "%\($0)" } ?? "--", icon: "humidity", unit: "")
+                WeatherMetricCard(title: "Rüzgar", value: weather.windSpeed.map { "\($0)" } ?? "--", icon: "wind", unit: "km/s")
+                WeatherMetricCard(title: "Hissedilen", value: weather.feelsLike.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer", unit: "")
+                WeatherMetricCard(title: "Kaynak", value: weather.source ?? "--", icon: "info.circle", unit: "")
             }
             
             // Forecast Section

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct AppTheme {
     static let spacing: CGFloat = 12
@@ -39,7 +40,12 @@ extension View {
 
 // Helper for blur effect in SwiftUI
 struct VisualEffectView: UIViewRepresentable {
-    var effect: UIEffect?
+    var effect: UIVisualEffect?
+    
+    init(effect: UIVisualEffect?) {
+        self.effect = effect
+    }
+    
     func makeUIView(context: UIViewRepresentableContext<Self>) -> UIVisualEffectView { UIVisualEffectView() }
     func updateUIView(_ uiView: UIVisualEffectView, context: UIViewRepresentableContext<Self>) { uiView.effect = effect }
 }

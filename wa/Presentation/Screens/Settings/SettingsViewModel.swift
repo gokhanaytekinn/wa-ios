@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 enum TemperatureUnit: String, CaseIterable, Identifiable {
     case celsius = "Metric"
@@ -14,27 +15,18 @@ enum ThemeMode: String, CaseIterable, Identifiable {
     var id: String { self.rawValue }
 }
 
+enum AppLanguage: String, CaseIterable, Identifiable {
+    case turkish = "tr"
+    case english = "en"
+    var id: String { self.rawValue }
+    var displayName: String { self == .turkish ? "Türkçe" : "English" }
+}
+
 @MainActor
 class SettingsViewModel: ObservableObject {
-    @Published var isDarkMode = false
-    @Published var themeMode: ThemeMode = .system
-    @Published var tempUnit: TemperatureUnit = .celsius
-    @Published var isLoggedIn = false
-    @Published var username: String? = nil
+    @AppStorage("themeMode") var themeMode: ThemeMode = .system
+    @AppStorage("tempUnit") var tempUnit: TemperatureUnit = .celsius
+    @AppStorage("appLanguage") var language: AppLanguage = .turkish
     
-    private let authRepository: AuthRepository
-    
-    init(authRepository: AuthRepository) {
-        self.authRepository = authRepository
-        self.isLoggedIn = authRepository.isLoggedIn()
-        self.username = authRepository.getUsername()
-    }
-    
-    func logout() {
-        Task {
-            await authRepository.logout()
-            self.isLoggedIn = false
-            self.username = nil
-        }
-    }
+    init() {}
 }

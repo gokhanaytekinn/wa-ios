@@ -4,8 +4,8 @@ struct ForecastResponse: Codable {
     let city: String
     let district: String?
     let temperatureUnit: String?
-    let forecasts: [SimpleForecast]?
     let source: String?
+    let forecasts: [SimpleForecast]?
     let sources: [ForecastSource]?
 }
 
@@ -15,10 +15,10 @@ struct SimpleForecast: Codable, Identifiable {
     let maxTemperature: Double
     let minTemperature: Double
     let avgTemperature: Double
-    let humidity: Int
+    let humidity: Int?
     let windSpeed: Double
-    let precipitationChance: Int
-    let precipitation: Double
+    let precipitationChance: Int?
+    let precipitation: Double?
     let description: String
     let weatherCode: String?
     

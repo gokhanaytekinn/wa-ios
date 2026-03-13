@@ -39,7 +39,7 @@ struct ForecastItemRow: View {
                     Image(systemName: "drop.fill")
                         .font(.caption2)
                         .foregroundColor(.blue)
-                    Text("%\(forecast.precipitationChance)")
+                    Text(forecast.precipitationChance.map { "%\($0)" } ?? "--")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
