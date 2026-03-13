@@ -6,42 +6,40 @@ struct FavoritesScreen: View {
     let onSelectLocation: (LocationSearchResult) -> Void
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                AppTheme.Colors.background.ignoresSafeArea()
-                
-                if viewModel.isLoading && viewModel.favorites.isEmpty {
-                    ProgressView()
-                } else if viewModel.favorites.isEmpty {
-                    VStack(spacing: 16) {
-                        Image(systemName: "heart.slash")
-                            .font(.system(size: 64))
-                            .foregroundColor(.secondary)
-                        Text(localizer.string(.noFavorites))
-                            .foregroundColor(.secondary)
-                    }
-                } else {
-                    List {
-                        ForEach(viewModel.favorites) { location in
-                            FavoriteRow(location: location) {
-                                onSelectLocation(location)
-                            }
-                            .swipeActions(edge: .trailing) {
-                                Button(role: .destructive) {
-                                    Task { await viewModel.removeFavorite(location: location) }
-                                } label: {
-                                    Label(localizer.string(.delete), systemImage: "trash")
-                                }
+        ZStack {
+            AppTheme.Colors.background.ignoresSafeArea()
+            
+            if viewModel.isLoading && viewModel.favorites.isEmpty {
+                ProgressView()
+            } else if viewModel.favorites.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "heart.slash")
+                        .font(.system(size: 64))
+                        .foregroundColor(.secondary)
+                    Text(localizer.string(.noFavorites))
+                        .foregroundColor(.secondary)
+                }
+            } else {
+                List {
+                    ForEach(viewModel.favorites) { location in
+                        FavoriteRow(location: location) {
+                            onSelectLocation(location)
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button(role: .destructive) {
+                                Task { await viewModel.removeFavorite(location: location) }
+                            } label: {
+                                Label(localizer.string(.delete), systemImage: "trash")
                             }
                         }
                     }
-                    .listStyle(PlainListStyle())
                 }
+                .listStyle(PlainListStyle())
             }
-            .navigationTitle(localizer.string(.favorites))
-            .onAppear {
-                Task { await viewModel.loadFavorites() }
-            }
+        }
+        .navigationTitle(localizer.string(.favorites))
+        .onAppear {
+            Task { await viewModel.loadFavorites() }
         }
     }
 }

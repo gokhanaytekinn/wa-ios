@@ -5,46 +5,44 @@ struct ForecastScreen: View {
     @EnvironmentObject var localizer: Localizer
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                LinearGradient(gradient: Gradient(colors: [.blue.opacity(0.3), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: AppTheme.spacing) {
-                        searchBar
-                        
-                        if viewModel.isLoading {
-                            ProgressView()
-                                .padding(.top, 40)
-                        } else if let data = viewModel.forecastData {
-                            forecastContent(data)
-                        } else {
-                            VStack(spacing: 12) {
-                                Image(systemName: "calendar")
-                                    .font(.system(size: 64))
-                                    .foregroundColor(.blue.opacity(0.6))
-                                Text(localizer.string(.pleaseSearch))
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(.top, 100)
+        ZStack {
+            LinearGradient(gradient: Gradient(colors: [.blue.opacity(0.3), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                .ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: AppTheme.spacing) {
+                    searchBar
+                    
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .padding(.top, 40)
+                    } else if let data = viewModel.forecastData {
+                        forecastContent(data)
+                    } else {
+                        VStack(spacing: 12) {
+                            Image(systemName: "calendar")
+                                .font(.system(size: 64))
+                                .foregroundColor(.blue.opacity(0.6))
+                            Text(localizer.string(.pleaseSearch))
+                                .foregroundColor(.secondary)
                         }
+                        .padding(.top, 100)
                     }
-                    .padding()
                 }
-                
-                if !viewModel.searchResults.isEmpty {
-                    searchResultsOverlay
-                }
+                .padding()
             }
-            .navigationTitle(localizer.string(.fiveDayForecast))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { viewModel.toggleFavorite() }) {
-                        Image(systemName: viewModel.isFavorite ? "heart.fill" : "heart")
-                            .foregroundColor(viewModel.isFavorite ? .red : .primary)
-                    }
+            
+            if !viewModel.searchResults.isEmpty {
+                searchResultsOverlay
+            }
+        }
+        .navigationTitle(localizer.string(.fiveDayForecast))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: { viewModel.toggleFavorite() }) {
+                    Image(systemName: viewModel.isFavorite ? "heart.fill" : "heart")
+                        .foregroundColor(viewModel.isFavorite ? .red : .primary)
                 }
             }
         }

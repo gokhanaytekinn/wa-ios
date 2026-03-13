@@ -5,49 +5,47 @@ struct HomeScreen: View {
     @EnvironmentObject var localizer: Localizer
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                // Background Gradient or Image
-                LinearGradient(gradient: Gradient(colors: [.blue.opacity(0.3), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: AppTheme.spacing) {
-                        // Search Bar
-                        searchBar
-                        
-                        if viewModel.isLoading {
-                            ProgressView()
-                                .padding(.top, 40)
-                        } else if let weather = viewModel.weather {
-                            weatherContent(weather)
-                        } else {
-                            VStack(spacing: 12) {
-                                Image(systemName: "cloud.sun.fill")
-                                    .font(.system(size: 64))
-                                    .foregroundColor(.blue.opacity(0.6))
-                                Text(localizer.string(.pleaseSearch))
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(.top, 100)
+        ZStack {
+            // Background Gradient or Image
+            LinearGradient(gradient: Gradient(colors: [.blue.opacity(0.3), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                .ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: AppTheme.spacing) {
+                    // Search Bar
+                    searchBar
+                    
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .padding(.top, 40)
+                    } else if let weather = viewModel.weather {
+                        weatherContent(weather)
+                    } else {
+                        VStack(spacing: 12) {
+                            Image(systemName: "cloud.sun.fill")
+                                .font(.system(size: 64))
+                                .foregroundColor(.blue.opacity(0.6))
+                            Text(localizer.string(.pleaseSearch))
+                                .foregroundColor(.secondary)
                         }
+                        .padding(.top, 100)
                     }
-                    .padding()
                 }
-                
-                // Search Results Overlay
-                if !viewModel.searchResults.isEmpty {
-                    searchResultsOverlay
-                }
+                .padding()
             }
-            .navigationTitle("Kokyel")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { viewModel.toggleFavorite() }) {
-                        Image(systemName: viewModel.isFavorite ? "heart.fill" : "heart")
-                            .foregroundColor(viewModel.isFavorite ? .red : .primary)
-                    }
+            
+            // Search Results Overlay
+            if !viewModel.searchResults.isEmpty {
+                searchResultsOverlay
+            }
+        }
+        .navigationTitle("Kokyel")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: { viewModel.toggleFavorite() }) {
+                    Image(systemName: viewModel.isFavorite ? "heart.fill" : "heart")
+                        .foregroundColor(viewModel.isFavorite ? .red : .primary)
                 }
             }
         }
