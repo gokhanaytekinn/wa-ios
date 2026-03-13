@@ -1,0 +1,156 @@
+import SwiftUI
+
+struct HomeScreen: View {
+    @StateObject var viewModel: HomeViewModel
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                // Background Gradient or Image
+                LinearGradient(gradient: Gradient(colors: [.blue.opacity(0.3), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: AppTheme.spacing) {
+                        // Search Bar
+                        searchBar
+                        
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .padding(.top, 40)
+                        } else if let weather = viewModel.weather {
+                            weatherContent(weather)
+                        } else {
+                            VStack(spacing: 12) {
+                                Image(systemName: "cloud.sun.fill")
+                                    .font(.system(size: 64))
+                                    .foregroundColor(.blue.opacity(0.6))
+                                Text("Lütfen bir konum arayın")
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.top, 100)
+                        }
+                    }
+                    .padding()
+                }
+                
+                // Search Results Overlay
+                if !viewModel.searchResults.isEmpty {
+                    searchResultsOverlay
+                }
+            }
+            .navigationTitle("Kokyel")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {}) {
+                        Image(systemName: "person.circle")
+                    }
+                }
+            }
+        }
+    }
+    
+    private var searchBar: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.secondary)
+            TextField("Şehir veya ilçe ara...", text: $viewModel.searchQuery)
+            if viewModel.isSearching {
+                ProgressView()
+                    .scaleEffect(0.8)
+            }
+        }
+        .padding(12)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
+    }
+    
+    private var searchResultsOverlay: some View {
+        VStack {
+            Spacer().frame(height: 60)
+            ScrollView {
+                VStack(spacing: 0) {
+                    ForEach(viewModel.searchResults) { result in
+                        Button(action: { viewModel.selectLocation(result) }) {
+                            HStack {
+                                Image(systemName: "location.fill")
+                                    .foregroundColor(.blue)
+                                VStack(alignment: .leading) {
+                                    Text(result.getDisplayName())
+                                        .foregroundColor(.primary)
+                                    if let country = result.country {
+                                        Text(country)
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                                Spacer()
+                            }
+                            .padding()
+                        }
+                        Divider().padding(.horizontal)
+                    }
+                }
+                .background(Color(.systemBackground))
+                .cornerRadius(12)
+                .shadow(radius: 5)
+                .padding()
+            }
+            Spacer()
+        }
+    }
+    
+    @ViewBuilder
+    private func weatherContent(_ weather: WeatherData) -> some View {
+        VStack(spacing: AppTheme.spacing) {
+            // Main Weather Info
+            if let mainSource = weather.sources?.first {
+                VStack(spacing: 4) {
+                    Text(weather.location?.city ?? "")
+                        .font(.title)
+                        .fontWeight(.bold)
+                    Text("\(Int(mainSource.current.temperature.rounded()))°")
+                        .font(.system(size: 64))
+                        .fontWeight(.thin)
+                    Text(mainSource.current.condition)
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 20)
+                
+                // Metrics Grid
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: AppTheme.spacing) {
+                    WeatherMetricCard(title: "Nem", value: "%\(mainSource.current.humidity)", icon: "humidity", unit: "")
+                    WeatherMetricCard(title: "Rüzgar", value: "\(mainSource.current.windSpeed)", icon: "wind", unit: "km/s")
+                    WeatherMetricCard(title: "UV İndeksi", value: "\(mainSource.current.uvIndex)", icon: "sun.max", unit: "")
+                    WeatherMetricCard(title: "Hissedilen", value: "\(Int(mainSource.current.feelsLike))°", icon: "thermometer", unit: "")
+                }
+            }
+            
+            // Forecast Section
+            if !viewModel.forecasts.isEmpty {
+                ForecastSectionView(forecasts: viewModel.forecasts)
+                    .padding(.top, 8)
+            }
+            
+            // Other Sources Section
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Hava Durumu Kaynakları")
+                    .font(.headline)
+                    .padding(.horizontal, 4)
+                
+                VStack(spacing: 8) {
+                    ForEach(weather.sources ?? []) { source in
+                        WeatherSourceCardView(
+                            source: source,
+                            isExpanded: viewModel.expandedSources.contains(source.id),
+                            onToggle: { viewModel.toggleSource(source.id) }
+                        )
+                    }
+                }
+            }
+            .padding(.top, 8)
+        }
+    }
+}
