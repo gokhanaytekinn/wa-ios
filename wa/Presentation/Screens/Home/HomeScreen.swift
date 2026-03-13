@@ -42,6 +42,13 @@ struct HomeScreen: View {
             }
             .navigationTitle("Kokyel")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { viewModel.toggleFavorite() }) {
+                        Image(systemName: "heart") // Add logic for filled/empty later if needed
+                    }
+                }
+            }
         }
     }
     
@@ -120,19 +127,31 @@ struct HomeScreen: View {
             }
             .padding(.vertical, 20)
             
-            // Metrics Grid
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: AppTheme.spacing) {
-                WeatherMetricCard(title: localizer.string(.humidity), value: weather.humidity.map { "\(localizer.string(.humidityUnit))\($0)" } ?? "--", icon: "humidity", unit: "")
-                WeatherMetricCard(title: localizer.string(.wind), value: weather.windSpeed.map { "\($0)" } ?? "--", icon: "wind", unit: localizer.string(.windUnit))
-                WeatherMetricCard(title: localizer.string(.feelsLike), value: weather.feelsLike.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer", unit: "")
-                WeatherMetricCard(title: localizer.string(.source), value: weather.source ?? "--", icon: "info.circle", unit: "")
+            // Metrics Card (Single container)
+            VStack(spacing: 16) {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                    WeatherMetricCard(title: localizer.string(.humidity), value: weather.humidity.map { "\(localizer.string(.humidityUnit))\($0)" } ?? "--", icon: "humidity", unit: "")
+                    WeatherMetricCard(title: localizer.string(.wind), value: weather.windSpeed.map { "\($0)" } ?? "--", icon: "wind", unit: localizer.string(.windUnit))
+                    WeatherMetricCard(title: localizer.string(.feelsLike), value: weather.feelsLike.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer", unit: "")
+                    WeatherMetricCard(title: localizer.string(.precipitation), value: weather.precipitation.map { "\($0) mm" } ?? "--", icon: "cloud.rain", unit: "")
+                }
+                
+                Divider()
+                
+                HStack {
+                    Text(localizer.string(.source))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text(weather.source ?? "--")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                }
             }
+            .padding()
+            .weatherCardStyle()
             
-            // Forecast Section
-            if !viewModel.forecasts.isEmpty {
-                ForecastSectionView(forecasts: viewModel.forecasts)
-                    .padding(.top, 8)
-            }
+            // Forecast removed from here as per user request
             
             // Other Sources Section
             VStack(alignment: .leading, spacing: 12) {

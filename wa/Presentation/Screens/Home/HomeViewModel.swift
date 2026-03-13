@@ -16,21 +16,39 @@ class HomeViewModel: ObservableObject {
     private let getForecastUseCase: GetForecastUseCase
     private let searchLocationUseCase: SearchLocationUseCase
     private let toggleFavoriteUseCase: ToggleFavoriteUseCase
+    private let locationManager: LocationManager
     
     private var searchCancellable: AnyCancellable?
+    private var locationCancellable: AnyCancellable?
     
     init(
         getWeatherUseCase: GetWeatherUseCase,
         getForecastUseCase: GetForecastUseCase,
         searchLocationUseCase: SearchLocationUseCase,
-        toggleFavoriteUseCase: ToggleFavoriteUseCase
+        toggleFavoriteUseCase: ToggleFavoriteUseCase,
+        locationManager: LocationManager
     ) {
         self.getWeatherUseCase = getWeatherUseCase
         self.getForecastUseCase = getForecastUseCase
         self.searchLocationUseCase = searchLocationUseCase
         self.toggleFavoriteUseCase = toggleFavoriteUseCase
+        self.locationManager = locationManager
         
         setupSearchDebounce()
+        setupLocationSubscription()
+    }
+    
+    private func setupLocationSubscription() {
+        locationCancellable = locationManager.$selectedLocation
+            .compactMap { $0 }
+            .sink { [weak self] location in
+                self?.searchQuery = location.getDisplayName()
+                if let city = location.city {
+                    Task {
+                        await self?.loadWeather(city: city, district: location.district)
+                    }
+                }
+            }
     }
     
     private func setupSearchDebounce() {
@@ -73,12 +91,14 @@ class HomeViewModel: ObservableObject {
     }
     
     func selectLocation(_ location: LocationSearchResult) {
-        searchQuery = location.getDisplayName()
+        locationManager.selectedLocation = location
         searchResults = []
-        if let city = location.city {
-            Task {
-                await loadWeather(city: city, district: location.district)
-            }
+    }
+    
+    func toggleFavorite() {
+        guard let city = weather?.city else { return }
+        Task {
+            try? await toggleFavoriteUseCase.execute(location: city)
         }
     }
     

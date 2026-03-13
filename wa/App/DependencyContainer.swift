@@ -32,7 +32,8 @@ class DependencyContainer: ObservableObject {
             getWeatherUseCase: getWeatherUseCase,
             getForecastUseCase: getForecastUseCase,
             searchLocationUseCase: searchLocationUseCase,
-            toggleFavoriteUseCase: toggleFavoriteUseCase
+            toggleFavoriteUseCase: toggleFavoriteUseCase,
+            locationManager: LocationManager.shared
         )
     }
     
@@ -50,7 +51,9 @@ class DependencyContainer: ObservableObject {
     func makeForecastViewModel() -> ForecastViewModel {
         ForecastViewModel(
             getForecastUseCase: getForecastUseCase,
-            searchLocationUseCase: searchLocationUseCase
+            searchLocationUseCase: searchLocationUseCase,
+            toggleFavoriteUseCase: toggleFavoriteUseCase,
+            locationManager: LocationManager.shared
         )
     }
 }

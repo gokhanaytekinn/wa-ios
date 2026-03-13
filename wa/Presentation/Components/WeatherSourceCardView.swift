@@ -52,7 +52,7 @@ struct WeatherSourceCardView: View {
                         
                         HStack(spacing: 16) {
                             MetricRow(title: localizer.string(.wind), value: current.windSpeed.map { "\($0) \(localizer.string(.windUnit))" } ?? "--", icon: "wind")
-                            MetricRow(title: localizer.string(.pressure), value: current.pressure.map { "\($0) hPa" } ?? "--", icon: "barometer")
+                            MetricRow(title: localizer.string(.precipitation), value: current.precipitation.map { "\($0) mm" } ?? "--", icon: "cloud.rain")
                         }
                     }
                     .padding()

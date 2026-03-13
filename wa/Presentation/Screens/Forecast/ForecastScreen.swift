@@ -39,6 +39,13 @@ struct ForecastScreen: View {
             }
             .navigationTitle(localizer.string(.fiveDayForecast))
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { viewModel.toggleFavorite() }) {
+                        Image(systemName: "heart")
+                    }
+                }
+            }
         }
     }
     
@@ -99,6 +106,24 @@ struct ForecastScreen: View {
                 .font(.title2)
                 .fontWeight(.bold)
             
+            // Average Metrics Carousel
+            if let averages = data.forecasts {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(localizer.string(.averageWeather))
+                        .font(.headline)
+                        .padding(.horizontal, 4)
+                    
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(averages) { forecast in
+                                CarouselMetricCard(forecast: forecast)
+                            }
+                        }
+                    }
+                }
+                .padding(.bottom, 8)
+            }
+            
             VStack(spacing: 12) {
                 ForEach(data.sources ?? []) { source in
                     ForecastSourceAccordion(
@@ -130,6 +155,18 @@ struct ForecastSourceAccordion: View {
                             .foregroundColor(.secondary)
                     }
                     Spacer()
+                    
+                    // Header metrics for source
+                    if let first = source.forecasts.first {
+                        HStack(spacing: 10) {
+                            Text("\(Int(first.maxTemperature.rounded()))°")
+                                .fontWeight(.bold)
+                            Text("\(Int(first.minTemperature.rounded()))°")
+                                .foregroundColor(.secondary)
+                        }
+                        .font(.subheadline)
+                    }
+                    
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                         .foregroundColor(.secondary)
                 }
@@ -149,6 +186,48 @@ struct ForecastSourceAccordion: View {
             }
         }
         .weatherCardStyle()
+    }
+}
+
+struct CarouselMetricCard: View {
+    let forecast: SimpleForecast
+    @EnvironmentObject var localizer: Localizer
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(formatDate(forecast.date))
+                .font(.caption)
+                .fontWeight(.bold)
+            
+            HStack {
+                Text("\(Int(forecast.maxTemperature.rounded()))°")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                Spacer()
+                Image(systemName: "sun.max.fill") // Use mapping later
+                    .foregroundColor(.orange)
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Label("\(forecast.humidity ?? 0)%", systemImage: "humidity")
+                Label("\(forecast.windSpeed) \(localizer.string(.windUnit))", systemImage: "wind")
+                Label("\(forecast.precipitationChance ?? 0)%", systemImage: "cloud.rain")
+            }
+            .font(.caption2)
+            .foregroundColor(.secondary)
+        }
+        .padding()
+        .frame(width: 140)
+        .weatherCardStyle()
+    }
+    
+    private func formatDate(_ dateString: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        guard let date = formatter.date(from: dateString) else { return dateString }
+        formatter.locale = Locale(identifier: localizer.language == .turkish ? "tr" : "en")
+        formatter.dateFormat = "EEE, dd MMM"
+        return formatter.string(from: date)
     }
 }
 

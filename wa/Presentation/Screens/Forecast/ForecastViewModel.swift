@@ -12,16 +12,38 @@ class ForecastViewModel: ObservableObject {
     
     private let getForecastUseCase: GetForecastUseCase
     private let searchLocationUseCase: SearchLocationUseCase
+    private let toggleFavoriteUseCase: ToggleFavoriteUseCase
+    private let locationManager: LocationManager
+    
     private var searchCancellable: AnyCancellable?
+    private var locationCancellable: AnyCancellable?
     
     init(
         getForecastUseCase: GetForecastUseCase,
-        searchLocationUseCase: SearchLocationUseCase
+        searchLocationUseCase: SearchLocationUseCase,
+        toggleFavoriteUseCase: ToggleFavoriteUseCase,
+        locationManager: LocationManager
     ) {
         self.getForecastUseCase = getForecastUseCase
         self.searchLocationUseCase = searchLocationUseCase
+        self.toggleFavoriteUseCase = toggleFavoriteUseCase
+        self.locationManager = locationManager
         
         setupSearchDebounce()
+        setupLocationSubscription()
+    }
+    
+    private func setupLocationSubscription() {
+        locationCancellable = locationManager.$selectedLocation
+            .compactMap { $0 }
+            .sink { [weak self] location in
+                self?.searchQuery = location.getDisplayName()
+                if let city = location.city {
+                    Task {
+                        await self?.loadForecast(city: city, district: location.district)
+                    }
+                }
+            }
     }
     
     private func setupSearchDebounce() {
@@ -57,12 +79,14 @@ class ForecastViewModel: ObservableObject {
     }
     
     func selectLocation(_ location: LocationSearchResult) {
-        searchQuery = location.getDisplayName()
+        locationManager.selectedLocation = location
         searchResults = []
-        if let city = location.city {
-            Task {
-                await loadForecast(city: city, district: location.district)
-            }
+    }
+    
+    func toggleFavorite() {
+        guard let city = forecastData?.city else { return }
+        Task {
+            try? await toggleFavoriteUseCase.execute(location: city)
         }
     }
     
