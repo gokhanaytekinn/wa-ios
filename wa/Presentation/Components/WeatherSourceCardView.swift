@@ -46,13 +46,18 @@ struct WeatherSourceCardView: View {
                 if let current = source.current {
                     VStack(spacing: 12) {
                         HStack(spacing: 16) {
-                            MetricRow(title: localizer.string(.feelsLike), value: current.feelsLike.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer")
-                            MetricRow(title: localizer.string(.humidity), value: current.humidity.map { "\(localizer.string(.humidityUnit))\($0)" } ?? "--", icon: "humidity")
+                            MetricRow(title: localizer.string(.temperature), value: current.temperature.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer.medium")
+                            MetricRow(title: localizer.string(.feelsLike), value: current.feelsLike.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer.low")
                         }
                         
                         HStack(spacing: 16) {
+                            MetricRow(title: localizer.string(.humidity), value: current.humidity.map { "\(localizer.string(.humidityUnit))\($0)" } ?? "--", icon: "humidity")
                             MetricRow(title: localizer.string(.wind), value: current.windSpeed.map { "\($0) \(localizer.string(.windUnit))" } ?? "--", icon: "wind")
+                        }
+                        
+                        HStack(spacing: 16) {
                             MetricRow(title: localizer.string(.precipitation), value: current.precipitation.map { "\($0) mm" } ?? "--", icon: "cloud.rain")
+                            Spacer().frame(maxWidth: .infinity)
                         }
                     }
                     .padding()

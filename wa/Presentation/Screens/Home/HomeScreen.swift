@@ -131,9 +131,10 @@ struct HomeScreen: View {
             // Metrics Card (Single container)
             VStack(spacing: 16) {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                    WeatherMetricCard(title: localizer.string(.temperature), value: weather.temperature.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer.medium", unit: "")
+                    WeatherMetricCard(title: localizer.string(.feelsLike), value: weather.feelsLike.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer.low", unit: "")
                     WeatherMetricCard(title: localizer.string(.humidity), value: weather.humidity.map { "\(localizer.string(.humidityUnit))\($0)" } ?? "--", icon: "humidity", unit: "")
                     WeatherMetricCard(title: localizer.string(.wind), value: weather.windSpeed.map { "\($0)" } ?? "--", icon: "wind", unit: localizer.string(.windUnit))
-                    WeatherMetricCard(title: localizer.string(.feelsLike), value: weather.feelsLike.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer", unit: "")
                     WeatherMetricCard(title: localizer.string(.precipitation), value: weather.precipitation.map { "\($0) mm" } ?? "--", icon: "cloud.rain", unit: "")
                 }
                 

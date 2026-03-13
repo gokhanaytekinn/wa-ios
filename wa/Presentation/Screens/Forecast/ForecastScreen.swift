@@ -210,6 +210,7 @@ struct CarouselMetricCard: View {
             }
             
             VStack(alignment: .leading, spacing: 4) {
+                Label("\(Int(forecast.avgTemperature.rounded()))°", systemImage: "thermometer.medium")
                 Label("\(forecast.humidity ?? 0)%", systemImage: "humidity")
                 Label("\(forecast.windSpeed) \(localizer.string(.windUnit))", systemImage: "wind")
                 Label("\(forecast.precipitationChance ?? 0)%", systemImage: "cloud.rain")
@@ -257,6 +258,8 @@ struct AccordionForecastRow: View {
             }
             
             HStack {
+                Label("\(Int(forecast.avgTemperature.rounded()))°", systemImage: "thermometer.medium")
+                Spacer()
                 Label("\(forecast.windSpeed) \(localizer.string(.windUnit))", systemImage: "wind")
                 Spacer()
                 Label("\(forecast.humidity ?? 0)%", systemImage: "humidity")

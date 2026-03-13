@@ -28,7 +28,7 @@ class Localizer: ObservableObject {
 }
 
 enum LocalizationKey {
-    case weather, favorites, settings, forecast, searchPlaceholder, humidity, wind, feelsLike, source
+    case weather, favorites, settings, forecast, searchPlaceholder, humidity, wind, feelsLike, source, temperature
     case pleaseSearch, errorLoading, high, low, precipitation, pressure, visibility, sourceTitle
     case theme, tempUnit, language, version, privacy, terms, fiveDayForecast, averageWeather, allSources
     case dailyForecast, windUnit, humidityUnit, noFavorites, delete
@@ -43,6 +43,7 @@ enum LocalizationKey {
         case .humidity: return "Nem"
         case .wind: return "Rüzgar"
         case .feelsLike: return "Hissedilen"
+        case .temperature: return "Sıcaklık"
         case .source: return "Kaynak"
         case .pleaseSearch: return "Lütfen bir konum arayın"
         case .errorLoading: return "Hava durumu yüklenemedi"
@@ -79,6 +80,7 @@ enum LocalizationKey {
         case .humidity: return "Humidity"
         case .wind: return "Wind"
         case .feelsLike: return "Feels Like"
+        case .temperature: return "Temperature"
         case .source: return "Source"
         case .pleaseSearch: return "Please search for a location"
         case .errorLoading: return "Weather could not be loaded"
