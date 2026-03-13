@@ -45,4 +45,12 @@ class DependencyContainer: ObservableObject {
     func makeSettingsViewModel() -> SettingsViewModel {
         SettingsViewModel()
     }
+    
+    @MainActor
+    func makeForecastViewModel() -> ForecastViewModel {
+        ForecastViewModel(
+            getForecastUseCase: getForecastUseCase,
+            searchLocationUseCase: searchLocationUseCase
+        )
+    }
 }

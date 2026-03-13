@@ -95,15 +95,15 @@ struct WeatherSource: Codable, Identifiable {
 }
 
 struct CurrentWeather: Codable {
-    let temperature: Double
-    let feelsLike: Double
+    let temperature: Double?
+    let feelsLike: Double?
     let humidity: Int?
-    let windSpeed: Double
-    let precipitation: Double
-    let pressure: Int
-    let visibility: Double
+    let windSpeed: Double?
+    let precipitation: Double?
+    let pressure: Int?
+    let visibility: Double?
     let uvIndex: Int?
-    let condition: String
+    let condition: String?
     let icon: String?
     
     enum CodingKeys: String, CodingKey {
@@ -129,9 +129,9 @@ struct ForecastDay: Codable, Identifiable {
 }
 
 struct DayWeather: Codable {
-    let maxTemp: Double
-    let minTemp: Double
-    let avgTemp: Double
+    let maxTemp: Double?
+    let minTemp: Double?
+    let avgTemp: Double?
     let condition: String?
     let icon: String?
     let precipitationChance: Int?
@@ -149,9 +149,9 @@ struct DayWeather: Codable {
 
 struct HourlyWeather: Codable, Identifiable {
     let id = UUID()
-    let time: String
-    let temperature: Double
-    let condition: String
+    let time: String?
+    let temperature: Double?
+    let condition: String?
     let icon: String?
     let precipitationChance: Int?
     

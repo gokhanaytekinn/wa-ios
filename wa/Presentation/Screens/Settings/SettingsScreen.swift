@@ -2,44 +2,45 @@ import SwiftUI
 
 struct SettingsScreen: View {
     @StateObject var viewModel: SettingsViewModel
+    @EnvironmentObject var localizer: Localizer
     
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Görünüm")) {
-                    Picker("Tema", selection: $viewModel.themeMode) {
+                Section(header: Text(localizer.string(.theme))) {
+                    Picker(localizer.string(.theme), selection: $viewModel.themeMode) {
                         ForEach(ThemeMode.allCases) { mode in
                             Text(mode.rawValue).tag(mode)
                         }
                     }
                     
-                    Picker("Sıcaklık Birimi", selection: $viewModel.tempUnit) {
+                    Picker(localizer.string(.tempUnit), selection: $viewModel.tempUnit) {
                         ForEach(TemperatureUnit.allCases) { unit in
                             Text(unit.displayName).tag(unit)
                         }
                     }
                 }
                 
-                Section(header: Text("Dil")) {
-                    Picker("Uygulama Dili", selection: $viewModel.language) {
+                Section(header: Text(localizer.string(.language))) {
+                    Picker(localizer.string(.language), selection: $viewModel.language) {
                         ForEach(AppLanguage.allCases) { lang in
                             Text(lang.displayName).tag(lang)
                         }
                     }
                 }
                 
-                Section(header: Text("Hakkında")) {
+                Section(header: Text(localizer.string(.version))) {
                     HStack {
-                        Text("Versiyon")
+                        Text(localizer.string(.version))
                         Spacer()
                         Text("1.5.0")
                             .foregroundColor(.secondary)
                     }
-                    Text("Gizlilik Politikası")
-                    Text("Kullanım Koşulları")
+                    Text(localizer.string(.privacy))
+                    Text(localizer.string(.terms))
                 }
             }
-            .navigationTitle("Ayarlar")
+            .navigationTitle(localizer.string(.settings))
         }
     }
 }

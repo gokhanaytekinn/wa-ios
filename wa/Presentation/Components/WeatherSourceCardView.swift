@@ -4,15 +4,16 @@ struct WeatherSourceCardView: View {
     let source: WeatherSource
     let isExpanded: Bool
     let onToggle: () -> Void
+    @EnvironmentObject var localizer: Localizer
     
     var body: some View {
         VStack(spacing: 0) {
             Button(action: onToggle) {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text(source.sourceName ?? "Bilinmeyen Kaynak")
+                        Text(source.sourceName ?? localizer.string(.source))
                             .font(.headline)
-                        Text(source.current?.condition ?? "Veri Yok")
+                        Text(source.current?.condition ?? localizer.string(.errorLoading))
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -45,18 +46,18 @@ struct WeatherSourceCardView: View {
                 if let current = source.current {
                     VStack(spacing: 12) {
                         HStack(spacing: 16) {
-                            MetricRow(title: "Hissedilen", value: "\(Int(current.feelsLike.rounded()))°", icon: "thermometer")
-                            MetricRow(title: "Nem", value: current.humidity.map { "%\($0)" } ?? "--", icon: "humidity")
+                            MetricRow(title: localizer.string(.feelsLike), value: current.feelsLike.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer")
+                            MetricRow(title: localizer.string(.humidity), value: current.humidity.map { "\(localizer.string(.humidityUnit))\($0)" } ?? "--", icon: "humidity")
                         }
                         
                         HStack(spacing: 16) {
-                            MetricRow(title: "Rüzgar", value: "\(current.windSpeed) km/s", icon: "wind")
-                            MetricRow(title: "Basınç", value: "\(current.pressure) hPa", icon: "barometer")
+                            MetricRow(title: localizer.string(.wind), value: current.windSpeed.map { "\($0) \(localizer.string(.windUnit))" } ?? "--", icon: "wind")
+                            MetricRow(title: localizer.string(.pressure), value: current.pressure.map { "\($0) hPa" } ?? "--", icon: "barometer")
                         }
                     }
                     .padding()
                 } else {
-                    Text("Bu kaynak için anlık veri mevcut değil.")
+                    Text(localizer.string(.errorLoading))
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .padding()

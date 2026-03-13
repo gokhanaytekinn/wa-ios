@@ -9,6 +9,7 @@ struct waApp: App {
         WindowGroup {
             MainTabView()
                 .environmentObject(container)
+                .environmentObject(Localizer.shared)
                 .preferredColorScheme(colorScheme)
                 .animation(.easeInOut, value: themeMode)
         }

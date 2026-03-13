@@ -2,32 +2,37 @@ import SwiftUI
 
 struct MainTabView: View {
     @EnvironmentObject var container: DependencyContainer
+    @EnvironmentObject var localizer: Localizer
     @State private var selectedTab = 0
     
     var body: some View {
         TabView(selection: $selectedTab) {
             HomeScreen(viewModel: container.makeHomeViewModel())
                 .tabItem {
-                    Label("Hava Durumu", systemImage: "cloud.sun.fill")
+                    Label(localizer.string(.weather), systemImage: "cloud.sun.fill")
                 }
                 .tag(0)
             
+            // Forecast tab will be added here properly after screen implementation
+            ForecastScreen(viewModel: container.makeForecastViewModel())
+                .tabItem {
+                    Label(localizer.string(.forecast), systemImage: "calendar")
+                }
+                .tag(1)
+            
             FavoritesScreen(viewModel: container.makeFavoritesViewModel()) { location in
-                // Handle location selection - switch to home and load weather
                 selectedTab = 0
-                // We'd need a more robust way to pass location to HomeViewModel 
-                // but for this MVP, we'll assume location is passed via global state or similar
             }
             .tabItem {
-                Label("Favoriler", systemImage: "heart.fill")
+                Label(localizer.string(.favorites), systemImage: "heart.fill")
             }
-            .tag(1)
+            .tag(2)
             
             SettingsScreen(viewModel: container.makeSettingsViewModel())
                 .tabItem {
-                    Label("Ayarlar", systemImage: "gearshape.fill")
+                    Label(localizer.string(.settings), systemImage: "gearshape.fill")
                 }
-                .tag(2)
+                .tag(3)
         }
     }
 }

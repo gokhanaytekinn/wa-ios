@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HomeScreen: View {
     @StateObject var viewModel: HomeViewModel
+    @EnvironmentObject var localizer: Localizer
     
     var body: some View {
         NavigationView {
@@ -25,7 +26,7 @@ struct HomeScreen: View {
                                 Image(systemName: "cloud.sun.fill")
                                     .font(.system(size: 64))
                                     .foregroundColor(.blue.opacity(0.6))
-                                Text("Lütfen bir konum arayın")
+                                Text(localizer.string(.pleaseSearch))
                                     .foregroundColor(.secondary)
                             }
                             .padding(.top, 100)
@@ -41,13 +42,6 @@ struct HomeScreen: View {
             }
             .navigationTitle("Kokyel")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {}) {
-                        Image(systemName: "person.circle")
-                    }
-                }
-            }
         }
     }
     
@@ -55,7 +49,7 @@ struct HomeScreen: View {
         HStack {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.secondary)
-            TextField("Şehir veya ilçe ara...", text: $viewModel.searchQuery)
+            TextField(localizer.string(.searchPlaceholder), text: $viewModel.searchQuery)
             if viewModel.isSearching {
                 ProgressView()
                     .scaleEffect(0.8)
@@ -128,10 +122,10 @@ struct HomeScreen: View {
             
             // Metrics Grid
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: AppTheme.spacing) {
-                WeatherMetricCard(title: "Nem", value: weather.humidity.map { "%\($0)" } ?? "--", icon: "humidity", unit: "")
-                WeatherMetricCard(title: "Rüzgar", value: weather.windSpeed.map { "\($0)" } ?? "--", icon: "wind", unit: "km/s")
-                WeatherMetricCard(title: "Hissedilen", value: weather.feelsLike.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer", unit: "")
-                WeatherMetricCard(title: "Kaynak", value: weather.source ?? "--", icon: "info.circle", unit: "")
+                WeatherMetricCard(title: localizer.string(.humidity), value: weather.humidity.map { "\(localizer.string(.humidityUnit))\($0)" } ?? "--", icon: "humidity", unit: "")
+                WeatherMetricCard(title: localizer.string(.wind), value: weather.windSpeed.map { "\($0)" } ?? "--", icon: "wind", unit: localizer.string(.windUnit))
+                WeatherMetricCard(title: localizer.string(.feelsLike), value: weather.feelsLike.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer", unit: "")
+                WeatherMetricCard(title: localizer.string(.source), value: weather.source ?? "--", icon: "info.circle", unit: "")
             }
             
             // Forecast Section
@@ -142,7 +136,7 @@ struct HomeScreen: View {
             
             // Other Sources Section
             VStack(alignment: .leading, spacing: 12) {
-                Text("Hava Durumu Kaynakları")
+                Text(localizer.string(.sourceTitle))
                     .font(.headline)
                     .padding(.horizontal, 4)
                 

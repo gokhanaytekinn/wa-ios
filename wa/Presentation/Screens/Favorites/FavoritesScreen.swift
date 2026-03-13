@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FavoritesScreen: View {
     @StateObject var viewModel: FavoritesViewModel
+    @EnvironmentObject var localizer: Localizer
     let onSelectLocation: (String) -> Void
     
     var body: some View {
@@ -16,7 +17,7 @@ struct FavoritesScreen: View {
                         Image(systemName: "heart.slash")
                             .font(.system(size: 64))
                             .foregroundColor(.secondary)
-                        Text("Henüz favori konumunuz yok")
+                        Text(localizer.string(.noFavorites))
                             .foregroundColor(.secondary)
                     }
                 } else {
@@ -29,7 +30,7 @@ struct FavoritesScreen: View {
                                 Button(role: .destructive) {
                                     Task { await viewModel.removeFavorite(location: location) }
                                 } label: {
-                                    Label("Sil", systemImage: "trash")
+                                    Label(localizer.string(.delete), systemImage: "trash")
                                 }
                             }
                         }
@@ -37,7 +38,7 @@ struct FavoritesScreen: View {
                     .listStyle(PlainListStyle())
                 }
             }
-            .navigationTitle("Favoriler")
+            .navigationTitle(localizer.string(.favorites))
             .onAppear {
                 Task { await viewModel.loadFavorites() }
             }

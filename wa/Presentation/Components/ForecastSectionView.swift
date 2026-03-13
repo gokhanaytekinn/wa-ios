@@ -2,10 +2,11 @@ import SwiftUI
 
 struct ForecastSectionView: View {
     let forecasts: [SimpleForecast]
+    @EnvironmentObject var localizer: Localizer
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("5 Günlük Tahmin")
+            Text(localizer.string(.fiveDayForecast))
                 .font(.headline)
                 .padding(.horizontal, 4)
             
@@ -20,6 +21,7 @@ struct ForecastSectionView: View {
 
 struct ForecastItemRow: View {
     let forecast: SimpleForecast
+    @EnvironmentObject var localizer: Localizer
     
     var body: some View {
         HStack {
@@ -59,9 +61,12 @@ struct ForecastItemRow: View {
     }
     
     private func formatDate(_ dateString: String) -> String {
-        // Simple day extraction for demo, real implementation would use DateFormatter
-        let days = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"]
-        // Assuming dateString is "yyyy-MM-dd"
-        return dateString // Placeholder
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        guard let date = formatter.date(from: dateString) else { return dateString }
+        
+        formatter.locale = Locale(identifier: localizer.language == .turkish ? "tr" : "en")
+        formatter.dateFormat = "EEE, dd MMM"
+        return formatter.string(from: date)
     }
 }
