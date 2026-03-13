@@ -5,47 +5,49 @@ struct HomeScreen: View {
     @EnvironmentObject var localizer: Localizer
     
     var body: some View {
-        ZStack {
-            // Background Gradient or Image
-            LinearGradient(gradient: Gradient(colors: [.blue.opacity(0.3), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea()
-            
-            ScrollView {
-                VStack(spacing: AppTheme.spacing) {
-                    // Search Bar
-                    searchBar
-                    
-                    if viewModel.isLoading {
-                        ProgressView()
-                            .padding(.top, 40)
-                    } else if let weather = viewModel.weather {
-                        weatherContent(weather)
-                    } else {
-                        VStack(spacing: 12) {
-                            Image(systemName: "cloud.sun.fill")
-                                .font(.system(size: 64))
-                                .foregroundColor(.blue.opacity(0.6))
-                            Text(localizer.string(.pleaseSearch))
-                                .foregroundColor(.secondary)
+        NavigationStack {
+            ZStack {
+                // Background Gradient or Image
+                LinearGradient(gradient: Gradient(colors: [.blue.opacity(0.3), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: AppTheme.spacing) {
+                        // Search Bar
+                        searchBar
+                        
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .padding(.top, 40)
+                        } else if let weather = viewModel.weather {
+                            weatherContent(weather)
+                        } else {
+                            VStack(spacing: 12) {
+                                Image(systemName: "cloud.sun.fill")
+                                    .font(.system(size: 64))
+                                    .foregroundColor(.blue.opacity(0.6))
+                                Text(localizer.string(.pleaseSearch))
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.top, 100)
                         }
-                        .padding(.top, 100)
                     }
+                    .padding()
                 }
-                .padding()
+                
+                // Search Results Overlay
+                if !viewModel.searchResults.isEmpty {
+                    searchResultsOverlay
+                }
             }
-            
-            // Search Results Overlay
-            if !viewModel.searchResults.isEmpty {
-                searchResultsOverlay
-            }
-        }
-        .navigationTitle("Kokyel")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { viewModel.toggleFavorite() }) {
-                    Image(systemName: viewModel.isFavorite ? "heart.fill" : "heart")
-                        .foregroundColor(viewModel.isFavorite ? .red : .primary)
+            .navigationTitle("Kokyel")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { viewModel.toggleFavorite() }) {
+                        Image(systemName: viewModel.isFavorite ? "heart.fill" : "heart")
+                            .foregroundColor(viewModel.isFavorite ? .red : .primary)
+                    }
                 }
             }
         }
@@ -134,18 +136,6 @@ struct HomeScreen: View {
                     WeatherMetricCard(title: localizer.string(.humidity), value: weather.humidity.map { "\(localizer.string(.humidityUnit))\($0)" } ?? "--", icon: "humidity", unit: "")
                     WeatherMetricCard(title: localizer.string(.wind), value: weather.windSpeed.map { "\($0)" } ?? "--", icon: "wind", unit: localizer.string(.windUnit))
                     WeatherMetricCard(title: localizer.string(.precipitation), value: weather.precipitation.map { "\($0) mm" } ?? "--", icon: "cloud.rain", unit: "")
-                }
-                
-                Divider()
-                
-                HStack {
-                    Text(localizer.string(.source))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text(weather.source ?? "--")
-                        .font(.caption)
-                        .fontWeight(.bold)
                 }
             }
             .padding()
