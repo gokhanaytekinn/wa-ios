@@ -3,7 +3,7 @@ import SwiftUI
 struct FavoritesScreen: View {
     @StateObject var viewModel: FavoritesViewModel
     @EnvironmentObject var localizer: Localizer
-    let onSelectLocation: (String) -> Void
+    let onSelectLocation: (LocationSearchResult) -> Void
     
     var body: some View {
         NavigationView {
@@ -22,7 +22,7 @@ struct FavoritesScreen: View {
                     }
                 } else {
                     List {
-                        ForEach(viewModel.favorites, id: \.self) { location in
+                        ForEach(viewModel.favorites) { location in
                             FavoriteRow(location: location) {
                                 onSelectLocation(location)
                             }
@@ -47,7 +47,7 @@ struct FavoritesScreen: View {
 }
 
 struct FavoriteRow: View {
-    let location: String
+    let location: LocationSearchResult
     let action: () -> Void
     
     var body: some View {
@@ -55,7 +55,7 @@ struct FavoriteRow: View {
             HStack {
                 Image(systemName: "location.fill")
                     .foregroundColor(.blue)
-                Text(location)
+                Text(location.getDisplayName())
                     .font(.headline)
                 Spacer()
                 Image(systemName: "chevron.right")

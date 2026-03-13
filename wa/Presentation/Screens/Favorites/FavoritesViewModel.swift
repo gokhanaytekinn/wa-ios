@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 class FavoritesViewModel: ObservableObject {
-    @Published var favorites: [String] = []
+    @Published var favorites: [LocationSearchResult] = []
     @Published var isLoading = false
     
     private let favoritesRepository: FavoritesRepository
@@ -22,9 +22,9 @@ class FavoritesViewModel: ObservableObject {
         isLoading = false
     }
     
-    func removeFavorite(location: String) async {
+    func removeFavorite(location: LocationSearchResult) async {
         do {
-            try await favoritesRepository.removeFavorite(location: location)
+            try await favoritesRepository.removeFavorite(location: location.getDisplayName())
             await loadFavorites()
         } catch {
             print("Remove favorite error: \(error)")

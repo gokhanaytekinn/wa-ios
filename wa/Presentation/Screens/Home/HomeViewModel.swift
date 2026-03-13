@@ -57,11 +57,16 @@ class HomeViewModel: ObservableObject {
     }
     
     func checkFavoriteState() async {
-        guard let city = weather?.city else { 
+        let locationName: String
+        if let selected = locationManager.selectedLocation {
+            locationName = selected.getDisplayName()
+        } else if let city = weather?.city {
+            locationName = city // Fallback
+        } else {
             isFavorite = false
-            return 
+            return
         }
-        isFavorite = await isFavoriteUseCase.execute(location: city)
+        isFavorite = await isFavoriteUseCase.execute(location: locationName)
     }
     
     private func setupSearchDebounce() {
@@ -109,9 +114,26 @@ class HomeViewModel: ObservableObject {
     }
     
     func toggleFavorite() {
-        guard let city = weather?.city else { return }
+        let locationToToggle: LocationSearchResult?
+        
+        if let selected = locationManager.selectedLocation {
+            locationToToggle = selected
+        } else if let weatherData = weather, let city = weatherData.city {
+            locationToToggle = LocationSearchResult(
+                city: city,
+                district: weatherData.district,
+                country: nil,
+                latitude: nil,
+                longitude: nil
+            )
+        } else {
+            locationToToggle = nil
+        }
+        
+        guard let location = locationToToggle else { return }
+        
         Task {
-            try? await toggleFavoriteUseCase.execute(location: city)
+            try? await toggleFavoriteUseCase.execute(location: location)
             await checkFavoriteState()
         }
     }

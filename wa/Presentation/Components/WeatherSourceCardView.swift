@@ -11,9 +11,9 @@ struct WeatherSourceCardView: View {
             Button(action: onToggle) {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text(source.sourceName ?? localizer.string(.source))
+                        Text(source.source ?? localizer.string(.source))
                             .font(.headline)
-                        Text(source.current?.condition ?? localizer.string(.errorLoading))
+                        Text(source.description ?? localizer.string(.errorLoading))
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -21,7 +21,7 @@ struct WeatherSourceCardView: View {
                     Spacer()
                     
                     HStack(spacing: 8) {
-                        if let temp = source.current?.temperature {
+                        if let temp = source.temperature {
                             Text("\(Int(temp.rounded()))°")
                                 .font(.title2)
                                 .fontWeight(.bold)
@@ -43,30 +43,23 @@ struct WeatherSourceCardView: View {
                 Divider()
                     .padding(.horizontal)
                 
-                if let current = source.current {
-                    VStack(spacing: 12) {
-                        HStack(spacing: 16) {
-                            MetricRow(title: localizer.string(.temperature), value: current.temperature.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer.medium")
-                            MetricRow(title: localizer.string(.feelsLike), value: current.feelsLike.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer.low")
-                        }
-                        
-                        HStack(spacing: 16) {
-                            MetricRow(title: localizer.string(.humidity), value: current.humidity.map { "\(localizer.string(.humidityUnit))\($0)" } ?? "--", icon: "humidity")
-                            MetricRow(title: localizer.string(.wind), value: current.windSpeed.map { "\($0) \(localizer.string(.windUnit))" } ?? "--", icon: "wind")
-                        }
-                        
-                        HStack(spacing: 16) {
-                            MetricRow(title: localizer.string(.precipitation), value: current.precipitation.map { "\($0) mm" } ?? "--", icon: "cloud.rain")
-                            Spacer().frame(maxWidth: .infinity)
-                        }
+                VStack(spacing: 12) {
+                    HStack(spacing: 16) {
+                        MetricRow(title: localizer.string(.temperature), value: source.temperature.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer.medium")
+                        MetricRow(title: localizer.string(.feelsLike), value: source.feelsLike.map { "\(Int($0.rounded()))°" } ?? "--", icon: "thermometer.low")
                     }
-                    .padding()
-                } else {
-                    Text(localizer.string(.errorLoading))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding()
+                    
+                    HStack(spacing: 16) {
+                        MetricRow(title: localizer.string(.humidity), value: source.humidity.map { "\(localizer.string(.humidityUnit))\($0)" } ?? "--", icon: "humidity")
+                        MetricRow(title: localizer.string(.wind), value: source.windSpeed.map { "\($0) \(localizer.string(.windUnit))" } ?? "--", icon: "wind")
+                    }
+                    
+                    HStack(spacing: 16) {
+                        MetricRow(title: localizer.string(.precipitation), value: source.precipitation.map { "\($0) mm" } ?? "--", icon: "cloud.rain")
+                        Spacer().frame(maxWidth: .infinity)
+                    }
                 }
+                .padding()
             }
         }
         .weatherCardStyle()

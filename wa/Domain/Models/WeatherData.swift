@@ -84,79 +84,22 @@ struct Location: Codable {
 
 struct WeatherSource: Codable, Identifiable {
     let id = UUID()
-    let sourceName: String?
-    let current: CurrentWeather?
-    let forecast: [ForecastDay]?
-    
-    enum CodingKeys: String, CodingKey {
-        case sourceName = "source_name"
-        case current, forecast
-    }
-}
-
-struct CurrentWeather: Codable {
+    let source: String?
     let temperature: Double?
     let feelsLike: Double?
     let humidity: Int?
     let windSpeed: Double?
     let precipitation: Double?
-    let pressure: Int?
-    let visibility: Double?
-    let uvIndex: Int?
-    let condition: String?
-    let icon: String?
+    let description: String?
+    let weatherCode: String?
+    let timestamp: String?
     
     enum CodingKeys: String, CodingKey {
-        case temperature
-        case feelsLike = "feels_like"
-        case humidity
-        case windSpeed = "wind_speed"
-        case precipitation, pressure, visibility
-        case uvIndex = "uv_index"
-        case condition, icon
+        case source, temperature, humidity, precipitation, description, timestamp
+        case feelsLike = "feelsLike"
+        case windSpeed = "windSpeed"
+        case weatherCode = "weatherCode"
     }
 }
 
-struct ForecastDay: Codable, Identifiable {
-    let id = UUID()
-    let date: String
-    let day: DayWeather
-    let hourly: [HourlyWeather]?
-    
-    enum CodingKeys: String, CodingKey {
-        case date, day, hourly
-    }
-}
 
-struct DayWeather: Codable {
-    let maxTemp: Double?
-    let minTemp: Double?
-    let avgTemp: Double?
-    let condition: String?
-    let icon: String?
-    let precipitationChance: Int?
-    let humidity: Int?
-    
-    enum CodingKeys: String, CodingKey {
-        case maxTemp = "max_temp"
-        case minTemp = "min_temp"
-        case avgTemp = "avg_temp"
-        case condition, icon
-        case precipitationChance = "precipitation_chance"
-        case humidity
-    }
-}
-
-struct HourlyWeather: Codable, Identifiable {
-    let id = UUID()
-    let time: String?
-    let temperature: Double?
-    let condition: String?
-    let icon: String?
-    let precipitationChance: Int?
-    
-    enum CodingKeys: String, CodingKey {
-        case time, temperature, condition, icon
-        case precipitationChance = "precipitation_chance"
-    }
-}

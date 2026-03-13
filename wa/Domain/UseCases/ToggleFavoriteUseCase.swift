@@ -7,10 +7,11 @@ struct ToggleFavoriteUseCase {
         self.repository = repository
     }
     
-    func execute(location: String) async throws {
-        let isFavorite = await repository.isFavorite(location: location)
+    func execute(location: LocationSearchResult) async throws {
+        let displayName = location.getDisplayName()
+        let isFavorite = await repository.isFavorite(location: displayName)
         if isFavorite {
-            try await repository.removeFavorite(location: location)
+            try await repository.removeFavorite(location: displayName)
         } else {
             try await repository.addFavorite(location: location)
         }

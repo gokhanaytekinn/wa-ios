@@ -52,11 +52,16 @@ class ForecastViewModel: ObservableObject {
     }
     
     func checkFavoriteState() async {
-        guard let city = forecastData?.city else { 
+        let locationName: String
+        if let selected = locationManager.selectedLocation {
+            locationName = selected.getDisplayName()
+        } else if let city = forecastData?.city {
+            locationName = city // Fallback
+        } else {
             isFavorite = false
-            return 
+            return
         }
-        isFavorite = await isFavoriteUseCase.execute(location: city)
+        isFavorite = await isFavoriteUseCase.execute(location: locationName)
     }
     
     private func setupSearchDebounce() {
@@ -97,9 +102,26 @@ class ForecastViewModel: ObservableObject {
     }
     
     func toggleFavorite() {
-        guard let city = forecastData?.city else { return }
+        let locationToToggle: LocationSearchResult?
+        
+        if let selected = locationManager.selectedLocation {
+            locationToToggle = selected
+        } else if let data = forecastData, !data.city.isEmpty {
+            locationToToggle = LocationSearchResult(
+                city: data.city,
+                district: data.district,
+                country: nil,
+                latitude: nil,
+                longitude: nil
+            )
+        } else {
+            locationToToggle = nil
+        }
+        
+        guard let location = locationToToggle else { return }
+        
         Task {
-            try? await toggleFavoriteUseCase.execute(location: city)
+            try? await toggleFavoriteUseCase.execute(location: location)
             await checkFavoriteState()
         }
     }

@@ -21,6 +21,7 @@ struct MainTabView: View {
                 .tag(1)
             
             FavoritesScreen(viewModel: container.makeFavoritesViewModel()) { location in
+                LocationManager.shared.selectedLocation = location
                 selectedTab = 0
             }
             .tabItem {

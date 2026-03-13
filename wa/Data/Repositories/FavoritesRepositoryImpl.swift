@@ -3,53 +3,50 @@ import Foundation
 class FavoritesRepositoryImpl: FavoritesRepository {
     private let apiClient: APIClient
     private let userDefaults = UserDefaults.standard
-    private let favoritesKey = "favorite_locations"
+    private let favoritesKey = "favorite_locations_data"
     
     init(apiClient: APIClient = .shared) {
         self.apiClient = apiClient
     }
     
-    func getFavorites() async throws -> [String] {
-        // In this app, favorites are stored per-user on backend, 
-        // but for simplicity and offline access, we'll sync with local storage
-        if let localFavorites = userDefaults.stringArray(forKey: favoritesKey) {
-            return localFavorites
+    func getFavorites() async throws -> [LocationSearchResult] {
+        if let data = userDefaults.data(forKey: favoritesKey) {
+            do {
+                return try JSONDecoder().decode([LocationSearchResult].self, from: data)
+            } catch {
+                print("Favorites decode error: \(error)")
+                return []
+            }
         }
-        
-        // If we want backend persistence:
-        // let response: [String] = try await apiClient.request(endpoint: "favorites")
-        // userDefaults.set(response, forKey: favoritesKey)
-        // return response
-        
         return []
     }
     
-    func addFavorite(location: String) async throws {
+    func addFavorite(location: LocationSearchResult) async throws {
         var favorites = try await getFavorites()
-        if !favorites.contains(location) {
+        let displayName = location.getDisplayName()
+        
+        if !favorites.contains(where: { $0.getDisplayName() == displayName }) {
             favorites.append(location)
-            userDefaults.set(favorites, forKey: favoritesKey)
-            
-            // Backend sync:
-            // try await apiClient.request(endpoint: "favorites", method: "POST", body: JSONEncoder().encode(["location": location]))
+            if let data = try? JSONEncoder().encode(favorites) {
+                userDefaults.set(data, forKey: favoritesKey)
+            }
         }
     }
     
     func removeFavorite(location: String) async throws {
         var favorites = try await getFavorites()
-        if let index = favorites.firstIndex(of: location) {
+        if let index = favorites.firstIndex(where: { $0.getDisplayName() == location }) {
             favorites.remove(at: index)
-            userDefaults.set(favorites, forKey: favoritesKey)
-            
-            // Backend sync:
-            // try await apiClient.request(endpoint: "favorites/\(location)", method: "DELETE")
+            if let data = try? JSONEncoder().encode(favorites) {
+                userDefaults.set(data, forKey: favoritesKey)
+            }
         }
     }
     
     func isFavorite(location: String) async -> Bool {
         do {
             let favorites = try await getFavorites()
-            return favorites.contains(location)
+            return favorites.contains(where: { $0.getDisplayName() == location })
         } catch {
             return false
         }
